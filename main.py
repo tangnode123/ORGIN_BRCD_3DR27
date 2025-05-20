@@ -16,7 +16,7 @@ class Point:
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y and self.z == other.z
 
-def RCDM_3D27(arr, visited):
+def VALID_CDM_3DR27(arr, visited):
     row = [0, 0, -1, 1, 0, 0]
     col = [1, -1, 0, 0, 0, 0]
     ver = [0, 0, 0, 0, 1, -1]
@@ -44,7 +44,7 @@ def RCDM_3D27(arr, visited):
 
     return len(visited) == 0 and found_one
 
-def rec(p):
+def BCDM_3DR27(p):
     global b, t, l, r, d, u
     B, T, L, R, D, U = sys.maxsize, -sys.maxsize, sys.maxsize, -sys.maxsize, sys.maxsize, -sys.maxsize
     count = 0
@@ -62,31 +62,8 @@ def rec(p):
                     U = max(U, k)
 
     return b == B and t == T and l == L and r == R and d == D and u == U
-def input_3d_matrix(layers, rows, cols):
-    matrix = []
-    for i in range(layers):
-        print(f"正在输入第 {i+1} 层:")
-        layer = []
-        for j in range(rows):
-            while True:
-                row_input = input(f"请输入第 {j+1} 行(用空格分隔 {cols} 个数字，只能是0或1): ")
-                try:
-                    row = list(map(int, row_input.split()))
-                    if len(row) != cols:
-                        print(f"错误: 需要输入 {cols} 个数字")
-                        continue
-                    # 检查是否所有数字都是0或1
-                    if any(num not in {0, 1} for num in row):
-                        print("错误: 只能输入0或1")
-                        continue
-                    layer.append(row)
-                    break
-                except ValueError:
-                    print("错误: 请输入有效的整数")
-        matrix.append(layer)
-    return matrix
 def setup_globals():
-    global b, t, l, r, d, u, chang, kuan, gao, zero_e_num, recnumber, num
+    global b, t, l, r, d, u, length, width, height, zero_e_num, recnumber, num
     global nodes_generated_pruned, nodes_generated_original
     
     # Reset global variables
@@ -98,18 +75,18 @@ def setup_globals():
     # Enter the rectangular cardinal direction relation matrix here. (same as your example)
     matrix = [
         [
-            [ 1, 1, 0],
-            [ 1, 1, 0],
+            [ 1, 1, 1],
+            [ 1, 1, 1],
             [ 0, 0, 0],
         ],
         [
-            [ 1, 1, 0],
-            [ 1, 1, 0],
+            [ 1, 1, 1],
+            [ 1, 1, 1],
             [ 0, 0, 0],
         ],
         [
-            [ 1, 1, 0],
-            [ 1, 1, 0],
+            [ 0, 0, 0],
+            [ 0, 0, 0],
             [ 0, 0, 0],
         ]
     ]
@@ -126,9 +103,9 @@ def setup_globals():
                     d = min(d, k_1)
                     u = max(u, k_1)
 
-    chang = t - b + 1
-    kuan = r - l + 1
-    gao = u - d + 1
+    length = t - b + 1
+    width = r - l + 1
+    height = u - d + 1
     zero_e_num = 0
     
     return matrix
@@ -136,23 +113,23 @@ def setup_globals():
 def ORGIN_BRCD_3DR27(p, a, zero_e_num):
     global num, recnumber, nodes_generated_pruned
     nodes_generated_pruned += 1  # 计数
-    if chang * kuan * gao == 8:
+    if length * width * height == 8:
         if zero_e_num >= 5:
             return
-    if chang * kuan * gao == 12:
+    if length * width * height == 12:
         if zero_e_num >= 8:
             return
-    if chang * kuan * gao == 18:
+    if length * width * height == 18:
         if zero_e_num >= 13:
             return
-    if chang * kuan * gao == 27:
+    if length * width * height == 27:
         if zero_e_num >= 21:
             return
-    if chang * kuan * gao == 9:
+    if length * width * height == 9:
         if zero_e_num >= 5:
             return
 
-    if a > chang * kuan * gao:
+    if a > length * width * height:
         cun = [[[0] * 5 for _ in range(5)] for _ in range(5)]
         visited = set()
 
@@ -162,16 +139,16 @@ def ORGIN_BRCD_3DR27(p, a, zero_e_num):
                     cun[i][j][k] = p[i][j][k]
                     if p[i][j][k] == 1:
                         visited.add(Point(i, j, k))
-        if RCDM_3D27(cun, visited):
+        if VALID_CDM_3DR27(cun, visited):
             num += 1
 
-            if rec(p):
+            if BCDM_3DR27(p):
                 recnumber += 1
         return
 
-    i = (a - 1) // (kuan * gao) + b
-    j = ((a - 1) % (kuan * gao)) // gao + l
-    k = ((a - 1) % (kuan * gao)) % gao + d
+    i = (a - 1) // (width * height) + b
+    j = ((a - 1) % (width * height)) // height + l
+    k = ((a - 1) % (width * height)) % height + d
 
     p[i][j][k] = 1
     ORGIN_BRCD_3DR27(p, a + 1, zero_e_num)
@@ -181,8 +158,8 @@ def ORGIN_BRCD_3DR27(p, a, zero_e_num):
 def ORGIN_BRCD_3DR27_NP(p, a):
     global num, recnumber, nodes_generated_original
     nodes_generated_original += 1  
-    if a > chang * kuan * gao:
-        cun = [[[0] * 5 for _ in range(5)] for _ in range(5)]
+    if a > length * width * height:
+        cun = [[[0] * 3 for _ in range(3)] for _ in range(3)]
         visited = set()
 
         for i in range(0, 3):
@@ -192,15 +169,15 @@ def ORGIN_BRCD_3DR27_NP(p, a):
                     if p[i][j][k] == 1:
                         visited.add(Point(i, j, k))
 
-        if RCDM_3D27(cun, visited):
+        if VALID_CDM_3DR27(cun, visited):
             num += 1
-            if rec(p):
+            if BCDM_3DR27(p):
                 recnumber += 1
         return
 
-    i = (a - 1) // (kuan * gao) + b
-    j = ((a - 1) % (kuan * gao)) // gao + l
-    k = ((a - 1) % (kuan * gao)) % gao + d
+    i = (a - 1) // (width * height) + b
+    j = ((a - 1) % (width * height)) // height + l
+    k = ((a - 1) % (width * height)) % height + d
 
     p[i][j][k] = 1
     ORGIN_BRCD_3DR27_NP(p, a + 1)
@@ -209,7 +186,7 @@ def ORGIN_BRCD_3DR27_NP(p, a):
 
 if __name__ == "__main__":
     # Number of runs for each algorithm
-    num_runs = 10
+    num_runs = 20
     
     # Test the original algorithm (without pruning)
     print("Testing original algorithm (without pruning)...")
@@ -253,6 +230,13 @@ if __name__ == "__main__":
     print(f"Pruned method average time: {avg_pruned_time:.6f} seconds")
     print(f"Original method average nodes generated: {avg_original_nodes:.1f}")
     print(f"Pruned method average nodes generated: {avg_pruned_nodes:.1f}")
+    
+    # Calculate speedup
+    if avg_pruned_time > 0:
+        speedup = avg_original_time / avg_pruned_time
+        print(f"\nSpeedup: {speedup:.2f}x")
+    else:
+        print("\nSpeedup: (pruned time was 0, cannot calculate)")
     
     # Calculate speedup
     if avg_pruned_time > 0:
